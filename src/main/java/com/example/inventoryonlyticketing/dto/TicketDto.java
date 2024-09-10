@@ -33,7 +33,7 @@ public record TicketDto(
     requireNonNull(ticket, "Ticket cannot be null");
     return new TicketDto(
         ticket.getTicketId().toString(),
-        ticket.getService().getServiceId(),
+        ticket.getTrainService().getServiceId(),
         ticket.getPassenger().getPassengerName(),
         ticket.getCarriageType().getDisplayName(),
         ticket.getSeat().getServiceCarriageId() + ticket.getSeat().getSeatNumber(),

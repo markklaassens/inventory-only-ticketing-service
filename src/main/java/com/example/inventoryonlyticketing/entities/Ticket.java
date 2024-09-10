@@ -10,7 +10,7 @@ import java.util.UUID;
 public class Ticket {
 
   private final UUID ticketId;
-  private final Service service;
+  private final TrainService trainService;
   private final Passenger passenger;
   private final Seat seat;
   private final CarriageType carriageType;
@@ -21,7 +21,7 @@ public class Ticket {
   private Booking booking;
 
   public Ticket(
-      Service service,
+      TrainService trainService,
       Passenger passenger,
       CarriageType carriageType,
       Seat seat,
@@ -31,7 +31,7 @@ public class Ticket {
       ZonedDateTime arrivalTime
   ) {
     this.ticketId = randomUUID();
-    this.service = requireNonNull(service, "Service must not be null");
+    this.trainService = requireNonNull(trainService, "Service must not be null");
     this.passenger = requireNonNull(passenger, "Passenger cannot be null");
     this.carriageType = requireNonNull(carriageType, "Carriage type cannot be null");
     this.seat = requireNonNull(seat, "Seat cannot be null");
@@ -45,8 +45,8 @@ public class Ticket {
     return ticketId;
   }
 
-  public Service getService() {
-    return service;
+  public TrainService getTrainService() {
+    return trainService;
   }
 
   public Passenger getPassenger() {

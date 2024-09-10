@@ -1,190 +1,130 @@
 package com.example.inventoryonlyticketing.utilities;
 
-import static com.example.inventoryonlyticketing.utilities.ReservationSystem.carriages;
-import static com.example.inventoryonlyticketing.utilities.ReservationSystem.passengers;
-import static com.example.inventoryonlyticketing.utilities.ReservationSystem.stations;
-import static com.example.inventoryonlyticketing.utilities.UserInterface.makeReservation;
+import static com.example.inventoryonlyticketing.utilities.ReservationSystem.stationGrid;
 
-import com.example.inventoryonlyticketing.dto.SeatDto;
-import com.example.inventoryonlyticketing.entities.Carriage;
-import com.example.inventoryonlyticketing.entities.Passenger;
-import com.example.inventoryonlyticketing.entities.Route;
-import com.example.inventoryonlyticketing.entities.Service;
+import com.example.inventoryonlyticketing.entities.TrainService;
 import com.example.inventoryonlyticketing.entities.Station;
-import com.example.inventoryonlyticketing.entities.enums.CarriageType;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.InputMismatchException;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.stream.IntStream;
+import java.util.Set;
 
 public class DataInitializer {
 
+
   public static void initializeData() {
-    initializeStations();
-    initializeRoutes();
-    initializeCarriages();
-    initializeServices();
+    final var stationGrid = initializeStations();
+    initializeServices(stationGrid);
   }
 
-  private static void initializeStations() {
-    new Station("paris001", "Paris Gare du Nord");
-    new Station("london001", "London Waterloo");
-    new Station("amsterdam001", "Amsterdam Centraal");
-    new Station("berlin001", "Berlin Hauptbahnhof");
-    new Station("calais001", "Calais Ville");
+  private static Map<Station, Set<Station>> initializeStations() {
+
+    // French train stations
+    final var parisStation = new Station("PGN01", "Paris Gare du Nord");
+    final var calaisStation = new Station("CV01", "Calais Ville");
+    final var marseilleStation = new Station("MSC01", "Marseille Saint-Charles");
+    final var bordeauxStation = new Station("BSJ01", "Bordeaux-Saint-Jean");
+    final var annecyStation = new Station("AS01", "Annecy Station");
+
+    // UK train stations
+    final var edinburghStation = new Station ("EW01", "Edinburgh Waverley");
+    final var londonStation = new Station("LW01", "London Waterloo");
+
+    //Germain train stations
+    final var berlinStation = new Station("BH01", "Berlin Hauptbahnhof");
+    final var hamburgStation = new Station("HCS01", "Hamburg Central Station");
+    final var munchenStation = new Station("MH01", "Munchen Hauptbahnhof");
+
+    // Other train stations
+    final var amsterdamStation = new Station("AC01", "Amsterdam Centraal");
+    final var brusselStation = new Station("BC01", "Brussel-Centraal");
+    final var copenhagenStation = new Station("CCS01", "Copenhagen Central Station");
+
+    stationGrid.put(edinburghStation, Set.of(londonStation));
+    stationGrid.put(londonStation, Set.of(edinburghStation, calaisStation));
+    stationGrid.put(calaisStation, Set.of(londonStation, parisStation, bordeauxStation));
+    stationGrid.put(parisStation, Set.of(calaisStation, amsterdamStation, brusselStation, marseilleStation, bordeauxStation, annecyStation));
+    stationGrid.put(bordeauxStation, Set.of(calaisStation, parisStation, marseilleStation));
+    stationGrid.put(annecyStation, Set.of(parisStation, marseilleStation));
+    stationGrid.put(marseilleStation, Set.of(parisStation, bordeauxStation, annecyStation));
+    stationGrid.put(brusselStation, Set.of(parisStation, amsterdamStation, berlinStation, munchenStation));
+    stationGrid.put(amsterdamStation, Set.of(parisStation, brusselStation, hamburgStation, berlinStation));
+    stationGrid.put(berlinStation, Set.of(brusselStation, amsterdamStation, hamburgStation, munchenStation));
+    stationGrid.put(hamburgStation, Set.of(brusselStation, amsterdamStation, copenhagenStation));
+    stationGrid.put(munchenStation, Set.of(brusselStation, berlinStation));
+    stationGrid.put(copenhagenStation, Set.of(hamburgStation));
+    return stationGrid;
   }
 
-  private static void initializeRoutes() {
-    new Route("LP", List.of(stations.get("london001"), stations.get("paris001")));
-    new Route("PC", List.of(stations.get("paris001"), stations.get("calais001")));
-    new Route("PA", List.of(stations.get("paris001"), stations.get("amsterdam001")));
-    new Route("AB", List.of(stations.get("amsterdam001"), stations.get("berlin001")));
-    new Route("LPA", List.of(stations.get("london001"), stations.get("paris001"), stations.get("amsterdam001")));
-  }
-
-  private static void initializeCarriages() {
-    new Carriage("A1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("B4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("C1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("D4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("E1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("F4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("G1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("H4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("I1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("J1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("K4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("L1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("M4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("N1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("O4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("P4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("Q1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("R4321", CarriageType.SECOND_CLASS, 20);
-    new Carriage("S1234", CarriageType.FIRST_CLASS, 20);
-    new Carriage("T4321", CarriageType.SECOND_CLASS, 20);
-  }
-
-  private static void initializeServices() {
+  private static void initializeServices(final Map<Station, Set<Station>> stationGrid) {
     try {
-      new Service(
-          "AP1-6720",
-          6720,
-          stations.get("london001"),
-          stations.get("paris001"),
-          new HashSet<>(carriages.values()),
-          ZonedDateTime.of(
-              LocalDate.of(2021, 4, 1),
-              LocalTime.of(12, 0, 0),
-              ZoneId.of("Europe/London")
-          ),
-          ZonedDateTime.of(
-              LocalDate.of(2021, 4, 1),
-              LocalTime.of(18, 30, 0),
-              ZoneId.of("Europe/Paris")
-          )
-      );
-      new Service(
-          "AP2-5160",
-          5160,
-          stations.get("paris001"),
-          stations.get("amsterdam001"),
-          new HashSet<>(carriages.values()),
-          ZonedDateTime.of(
-              LocalDate.of(2021, 4, 2),
-              LocalTime.of(19, 0, 0),
-              ZoneId.of("Europe/Paris")),
-          ZonedDateTime.of(
-              LocalDate.of(
-                  2021, 4, 1),
-              LocalTime.of(23, 30, 0),
-              ZoneId.of("Europe/Amsterdam")
-          )
-      );
-      new Service(
-          "AP2-4380",
-          4380,
-          stations.get("amsterdam001"),
-          stations.get("berlin001"),
-          new HashSet<>(carriages.values()),
-          ZonedDateTime.of(
-              LocalDate.of(2021, 4, 2),
-              LocalTime.of(0, 30, 0),
-              ZoneId.of("Europe/Amsterdam")
-          ),
-          ZonedDateTime.of(
-              LocalDate.of(2021, 4, 1),
-              LocalTime.of(18, 30, 0),
-              ZoneId.of("Europe/Berlin")
-          )
-      );
-      new Service(
-          "D20-5160",
-          5160,
-          stations.get("paris001"),
-          stations.get("calais001"),
-          new HashSet<>(carriages.values()),
-          ZonedDateTime.of(
-              LocalDate.of(2021, 12, 20),
-              LocalTime.of(19, 0, 0),
-              ZoneId.of("Europe/Paris")),
-          ZonedDateTime.of(
-              LocalDate.of(
-                  2021, 12, 20),
-              LocalTime.of(23, 0, 0),
-              ZoneId.of("Europe/Paris")
-          )
-      );
-    } catch (NoSuchElementException | IllegalArgumentException e) {
-      System.out.printf("Failed to create service: %s.%n".formatted(e.getMessage()));
-    }
-  }
-
-  public static void initializeBookings() {
-    final var integerList = IntStream.rangeClosed(1, 12).boxed().toList();
-    initializePassengers(integerList);
-    initializeTwelveCalaisToParisBookings(integerList);
-  }
-
-  private static void initializePassengers(List<Integer> integerList) {
-    new Passenger("harry.pompenaar@example.com", "Harry Pompenaar");
-    new Passenger("jeroen.nitdoen@example.com", "Jeroen Nitdoen");
-    for (final var i : integerList) {
-      new Passenger("test" + i + "@example.com", "Test " + i);
-    }
-  }
-
-  private static void initializeTwelveCalaisToParisBookings(List<Integer> integerList) {
-    final var serviceId = "D20-5160";
-    final Queue<SeatDto> seatDtoQueue = new LinkedList<>();
-    for (final var i : integerList) {
-      seatDtoQueue.add(new SeatDto("A", i));
-    }
-    try {
-      passengers.keySet().stream()
-          .filter(pe -> pe.startsWith("test"))
-          .sorted(Comparator.comparingInt(pe -> {
-            final var numberPart = pe.substring(4, pe.indexOf('@'));
-            return Integer.parseInt(numberPart);  // Convert the extracted number to an integer
-          })).forEach(pe -> {
-            final var seatDto = Optional.ofNullable(seatDtoQueue.poll()).orElseThrow(
-                () -> new InputMismatchException(
-                    "No booking can't be made for passenger with email %s, no more seatDtos.%n".formatted(pe))
+      // Generate services on routes for the upcoming 30 days
+      for (int i = 0; i <= 30; i++) {
+        // Get every station on the station grid
+        int stationNumber = 1;
+        for (final var station : stationGrid.keySet()) {
+          //Get every station it is connected to
+          int connectedStationNumber = 1;
+          for (final var connectedStation: stationGrid.get(station)) {
+            final var date = LocalDate.now().plusDays(i);
+            final var localDateString = date.toString().substring(0, 2).toUpperCase();
+            final var serviceNumber = 1000 * stationNumber + connectedStationNumber;
+            //Generate morning service
+            new TrainService(
+                serviceNumber,
+                localDateString + "-" + serviceNumber,
+                station,
+                connectedStation,
+                20,
+                LocalDateTime.of(
+                    LocalDate.now().plusDays(i),
+                    LocalTime.of(5, 0, 0).plusHours((stationNumber + connectedStationNumber))
+                ),
+                LocalDateTime.of(
+                    LocalDate.now().plusDays(i),
+                    LocalTime.of(7, 0, 0).plusHours((stationNumber + connectedStationNumber))
+                )
             );
-            makeReservation(pe, Map.of(serviceId, List.of(seatDto)));
-          });
-    } catch (InputMismatchException e) {
-      System.out.println("An error occurred while initializing 10 bookings from Paris to Calais " + e.getMessage());
-    }
+            // Generate noon service
+            new TrainService(
+                serviceNumber,
+                localDateString + "-" + serviceNumber,
+                station,
+                connectedStation,
+                20,
+                LocalDateTime.of(
+                    LocalDate.now().plusDays(i),
+                    LocalTime.of(12, 0, 0).plusHours((stationNumber + connectedStationNumber))
+                ),
+                LocalDateTime.of(
+                    LocalDate.now().plusDays(i),
+                    LocalTime.of(14, 0, 0).plusHours((stationNumber + connectedStationNumber))
+                )
+            );
+            // Generate evening service
+            new TrainService(
+                serviceNumber,
+                localDateString + "-" + serviceNumber,
+                station,
+                connectedStation,
+                20,
+                LocalDateTime.of(
+                    LocalDate.now().plusDays(i),
+                    LocalTime.of(18, 0, 0).plusHours((stationNumber + connectedStationNumber))
+                ),
+                LocalDateTime.of(
+                    LocalDate.now().plusDays(i),
+                    LocalTime.of(20, 0, 0).plusHours((stationNumber + connectedStationNumber))
+                )
+            );
+            connectedStationNumber++;
+          }
+          stationNumber++;
+        }
+      }
+    } catch (NoSuchElementException | IllegalArgumentException e){
+      System.out.printf("Failed to create service: %s.%n".formatted(e.getMessage()));  }
   }
 }

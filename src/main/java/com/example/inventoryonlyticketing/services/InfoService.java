@@ -1,12 +1,9 @@
 package com.example.inventoryonlyticketing.services;
 
-import static com.example.inventoryonlyticketing.utilities.ReservationSystem.services;
 import static com.example.inventoryonlyticketing.utilities.ReservationSystem.stations;
 import static com.example.inventoryonlyticketing.utilities.ReservationSystem.tickets;
 
 import com.example.inventoryonlyticketing.dto.PassengerDto;
-import com.example.inventoryonlyticketing.dto.ServiceDto;
-import com.example.inventoryonlyticketing.entities.Service;
 import com.example.inventoryonlyticketing.entities.Station;
 import com.example.inventoryonlyticketing.exceptions.InsufficientSearchParametersException;
 import com.example.inventoryonlyticketing.exceptions.StationNotFoundException;
@@ -32,9 +29,9 @@ public class InfoService {
     return passengersAtStations;
   }
 
-  public ServiceDto getServiceInfo(String serviceId) {
-    return ServiceDto.from(services.get(serviceId));
-  }
+//  public ServiceDto getServiceInfo(String serviceId) {
+//    return ServiceDto.from(trainServices.get(serviceId));
+//  }
 
   public Map<List<String>, Integer> getAmountOfPassengersBetweenTwoStations(String departureStationId,
       String arrivalStationId) {
@@ -43,13 +40,13 @@ public class InfoService {
     final var departureStation = getStation(departureStationId);
     final var arrivalStation = getStation(arrivalStationId);
 
-    final int totalPassengers = services.values().stream()
-        .filter(s -> s.getDepatureStation().equals(departureStation) && s.getArrivalStation().equals(arrivalStation))
-        .map(Service::getPassengerTotal)
-        .reduce(0, Integer::sum);
+//    final int totalPassengers = trainServices.values().stream()
+//        .filter(s -> s.getDepatureStation().equals(departureStation) && s.getArrivalStation().equals(arrivalStation))
+//        .map(Service::getPassengerTotal)
+//        .reduce(0, Integer::sum);
 
-    passengersBetweenStations.put(List.of(
-        departureStation.getStationName(), arrivalStation.getStationName()), totalPassengers);
+//    passengersBetweenStations.put(List.of(
+//        departureStation.getStationName(), arrivalStation.getStationName()), totalPassengers);
     return passengersBetweenStations;
   }
 
@@ -73,7 +70,7 @@ public class InfoService {
         .filter(ticket -> ticket.getArrivalStation().equals(arrivalStation))
         .filter(ticket -> ticket.getSeat().getServiceCarriageId().equals(seat.substring(0, 1)))
         .filter(ticket -> ticket.getSeat().getSeatNumber() == (Integer.parseInt(seat.substring(1))))
-        .filter(ticket -> ticket.getService().getServiceNumber() == serviceNumber)
+//        .filter(ticket -> ticket.getService().getServiceNumber() == serviceNumber)
         .toList();
     if (ticketList.size() > 1) {
       throw new InsufficientSearchParametersException(
